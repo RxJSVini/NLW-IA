@@ -19,7 +19,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-
+     "outDir": "./build",
 
     /* Paths */
     "baseUrl": ".",
