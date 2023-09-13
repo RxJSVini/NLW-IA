@@ -1,9 +1,8 @@
-function App() {
+export function App() {
 
   return (
     <>
-
+       oi
     </>
   )
 }
-export  { App }
