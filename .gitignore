@@ -9,6 +9,9 @@ lerna-debug.log*
 
 node_modules
 migrations
+**/migrations/
+****/migrations/
+**/migrations/**
 build
 dist
 dist-ssr
