@@ -1,0 +1,7 @@
+services:
+  frontend:
+    build:
+      context: upload-ia
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
