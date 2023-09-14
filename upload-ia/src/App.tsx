@@ -1,10 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { Label  } from '@/components/ui/label';
-import { Select, SelectTrigger, SelectContent, SelectValue, SelectItem  } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import {
+    Select,
+    SelectTrigger,
+    SelectContent,
+    SelectValue,
+    SelectItem,
+} from '@/components/ui/select';
 
-import { Github, FileVideo, Upload } from 'lucide-react';
+import { Github, FileVideo, Upload, Wand2 } from 'lucide-react';
 
 export function App() {
     return (
@@ -48,7 +55,6 @@ export function App() {
 
                 <aside className="w-80 space-y-4">
                     <form className="space-y-6">
-
                         <label
                             className="border flex rounded-md aspect-video cursor-pointer 
               border-dashed text-sm flex-col gap-2 items-center justify-center
@@ -64,43 +70,73 @@ export function App() {
                             className="sr-only"
                         />
 
-                        <Separator/>
-
+                        <Separator />
 
                         <div className="space-y-2">
-                            <Label htmlFor="transcription_prompt">Prompt de transcrição</Label>
-                            <Textarea id="transcription_prompt" className="h-20 leading-relaxed resize-none" placeholder="Inclua palavras-chave mencionadas no vídeo separadas por vírgula (,)">
-
-                            </Textarea>
+                            <Label htmlFor="transcription_prompt">
+                Prompt de transcrição
+                            </Label>
+                            <Textarea
+                                id="transcription_prompt"
+                                className="h-20 leading-relaxed resize-none"
+                                placeholder="Inclua palavras-chave mencionadas no vídeo separadas por vírgula (,)"
+                            ></Textarea>
                         </div>
 
-
                         <Button type="submit" className="w-full">
-                            <Upload className="w04 h-4 ml-2"/>
-              Executar
+                            <Upload className="w04 h-4 ml-2" />
+              Carregar video
                             {/* <Wand2 className="h-4 w-4 ml-2" /> */}
                         </Button>
                     </form>
-                    <Separator/>
+                    <Separator />
                     <form className="space-y-6">
-                        <div className='space-y-2'>
-                            <Label>Modelo</Label>
-                            <Select  disabled defaultValue='gpt3.5'>
+
+                        <div className="space-y-2">
+                            <Label>Prompt</Label>
+                            <Select>
                                 <SelectTrigger>
-                                    <SelectValue/>
+                                    <SelectValue placeholder='Selecione um prompt ...'/>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value='gpt3.5'>
-                                        gpt-3.5-turbo 16k
-                                    </SelectItem>
+                                    <SelectItem value="title">Titulo do Youtube</SelectItem>
+                                    <SelectItem value="description">Descrição do Youtube</SelectItem>
                                 </SelectContent>
-
                             </Select>
-                            <span className='block text-xs text-muted-foreground italic'>
-                                Você poderá customizar essa opção em breve</span>
                         </div>
+
+
+                        <div className="space-y-2">
+                            <Label>Modelo</Label>
+                            <Select disabled defaultValue="gpt3.5">
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="gpt3.5">gpt-3.5-turbo 16k</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <span className="block text-xs text-muted-foreground italic">
+                Você poderá customizar essa opção em breve
+                            </span>
+                        </div>
+
+                        <Separator />
+                        <div className="space-y-2">
+                            <Label>Temperatura</Label>
+                            <Slider min={0} max={1} step={0.1}></Slider>
+                            <span className="block text-xs text-muted-foreground italic leading-relaxed">
+                Valores mais altos tendem a deixar o resultado mais criativo e
+                mais surpreendente
+                            </span>
+                        </div>
+                        <Separator />
+                        <Button className="w-full">
+              Executar
+                            <Wand2 className="w-4 h-4 ml-2" />
+                        </Button>
                     </form>
-                    <Separator/>
+                    <Separator />
                 </aside>
             </main>
         </div>
