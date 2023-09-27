@@ -4,6 +4,8 @@ import { FileVideo, Upload } from "lucide-react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { ChangeEvent, useState, useMemo, FormEvent, useRef } from 'react';
+import { getFFmpeg } from "@/lib/ffmpeg";
+import { fetchFile } from "@ffmpeg/util";
 
 export function VideoInputForm() {
     const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -19,6 +21,13 @@ export function VideoInputForm() {
 
         setVideoFile(selectedFile)
 
+    }
+
+    async function convertVideoToAudio(video: File){
+        console.log('Convert started.');
+        const ffmpeg = await getFFmpeg()
+
+        ffmpeg.writeFile('input.mp4', await fetchFile(video))
     }
 
     function handleUploadVideo(e:FormEvent<HTMLFormElement>){
