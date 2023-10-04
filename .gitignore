@@ -30,3 +30,4 @@ dist-ssr
 *.sql
 .mp3
 .env
+tmp/

@@ -6,10 +6,23 @@ import { Textarea } from "./ui/textarea";
 import { ChangeEvent, useState, useMemo, FormEvent, useRef } from 'react';
 import { getFFmpeg } from "@/lib/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
+import { api } from "../lib/axios"
+
+type Status = 'waiting' | 'converting' | 'uploading' | 'generating' | 'success';
+
+
+const statusMessages = {
+    converting: 'Convertendo...',
+    generating: 'Transcrevendo...',
+    uploading: 'Carregando...',
+    success: 'Sucesso!',
+  }
 
 export function VideoInputForm() {
+
     const [videoFile, setVideoFile] = useState<File | null>(null);
     const promptInputRef = useRef<HTMLTextAreaElement>(null);
+    const [status, setStatus] = useState<Status>('waiting');
 
     function handleFileSelected(e: ChangeEvent<HTMLInputElement>) {
         e.preventDefault();
@@ -23,22 +36,73 @@ export function VideoInputForm() {
 
     }
 
-    async function convertVideoToAudio(video: File){
+    async function convertVideoToAudio(video: File) {
         console.log('Convert started.');
         const ffmpeg = await getFFmpeg()
 
         ffmpeg.writeFile('input.mp4', await fetchFile(video))
+
+        ffmpeg.on('progress', progress => {
+            console.log(`Convert progress:${Math.round(progress.progress * 100)}`)
+        })
+
+
+        await ffmpeg.exec([
+            '-i',
+            'input.mp4',
+            '-map',
+            '0:a',
+            '-b:a',
+            '20k',
+            '-acodec',
+            'libmp3lame',
+            'output.mp3'
+        ])
+
+
+        const data = await ffmpeg.readFile('output.mp3')
+
+        const audioFileBlob = new Blob([data], { type: 'audio/mpeg' })
+
+        const audioFile = new File([audioFileBlob], 'audio.mp3', {
+            type: 'audio/mpeg',
+        })
+
+
+        console.log('Convert finished')
+
+        return audioFile;
     }
 
-    function handleUploadVideo(e:FormEvent<HTMLFormElement>){
+    async function handleUploadVideo(e: FormEvent<HTMLFormElement>)  {
         e.preventDefault();
         const prompt = promptInputRef.current?.value;
 
-        if(!videoFile){
+        if (!videoFile) {
             return;
         }
 
+        setStatus('converting');
 
+        const audioFile = await convertVideoToAudio(videoFile);
+        const data = new FormData()
+
+        data.append('file', audioFile)
+
+        setStatus('uploading');
+
+        const response = await api.post('/videos', data)
+
+        const responseVideo = response.data.id;
+        
+        setStatus('generating');
+
+        await api.post(`/videos/${responseVideo}/transcription`, {
+            prompt,
+        })
+
+        setStatus('success');
+        
     }
 
     const previewURL = useMemo(() => {
@@ -60,7 +124,7 @@ export function VideoInputForm() {
                     <video src={previewURL} controls={false} className="pointer-events-none absolute inset-0" />
                 ) : (
                     <>
-                    <FileVideo className="w-4 h-4" />
+                        <FileVideo className="w-4 h-4" />
                         Selecione um video
                     </>
                 )}
@@ -73,18 +137,28 @@ export function VideoInputForm() {
                     Prompt de transcrição
                 </Label>
                 <Textarea
+                    disabled={status !== 'waiting'}
                     ref={promptInputRef}
                     id="transcription_prompt"
                     className="h-20 leading-relaxed resize-none"
                     placeholder="Inclua palavras-chave mencionadas no vídeo separadas por vírgula (,)"
-                ></Textarea>
+                />
             </div>
 
-            <Button type="submit" className="w-full">
-                <Upload className="w04 h-4 ml-2" />
-                Carregar video
-                {/* <Wand2 className="h-4 w-4 ml-2" /> */}
-            </Button>
+
+            <Button
+        data-success={status === 'success'}
+        disabled={status !== 'waiting'}
+        type="submit"
+        className="w-full data-[success=true]:bg-emerald-400"
+      >
+        {status === 'waiting'? (
+          <>
+            Carregar video
+            <Upload className="w-4 h-4 ml-2" />
+          </>
+        ) : statusMessages[status]}
+      </Button>
         </form>
     )
 }

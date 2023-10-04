@@ -9,6 +9,9 @@ export default defineConfig({
     //     outDir: 'build'
     // },
     plugins: [react()],
+    optimizeDeps:{
+        exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util']
+    },
     resolve:{
         alias: {
             '@':path.resolve(__dirname, './src'),
