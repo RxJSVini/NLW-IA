@@ -29,5 +29,5 @@ dist-ssr
 *.sw?
 *.sql
 .mp3
-.env
+*.env
 tmp/
