@@ -33,6 +33,7 @@ export async function createTranscriptionRoute(app:FastifyInstance) {
             language: 'pt',
             response_format: 'json',
             temperature: 0,
+            prompt
         });
         
 
